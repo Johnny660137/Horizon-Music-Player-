@@ -92,14 +92,18 @@ class MainActivity : ComponentActivity() {
         val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok -> granted = ok; if (ok) songs = scan() }
 
         LaunchedEffect(Unit) { if (granted) songs = scan() else permission.launch(permissionName()) }
-        LaunchedEffect(controller) {
-            val p = controller ?: return@LaunchedEffect
-            val listener = object : Player.Listener {
-                override fun onIsPlayingChanged(isPlaying: Boolean) { playing = isPlaying }
-                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) { currentId = mediaItem?.mediaId?.toLongOrNull() ?: -1L; duration = p.duration.coerceAtLeast(0L) }
+        DisposableEffect(controller) {
+            val p = controller
+            if (p == null) {
+                onDispose { }
+            } else {
+                val listener = object : Player.Listener {
+                    override fun onIsPlayingChanged(isPlaying: Boolean) { playing = isPlaying }
+                    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) { currentId = mediaItem?.mediaId?.toLongOrNull() ?: -1L; duration = p.duration.coerceAtLeast(0L) }
+                }
+                p.addListener(listener)
+                onDispose { p.removeListener(listener) }
             }
-            p.addListener(listener)
-            onDispose { p.removeListener(listener) }
         }
         LaunchedEffect(playing, currentId) {
             while (true) {
