@@ -18,24 +18,12 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - name: Locate Android SDK manager
-        shell: bash
-        run: |
-          SDKMANAGER="$(find /usr/local/lib/android/sdk -type f -name sdkmanager -perm -u+x 2>/dev/null | head -n 1)"
-          if [ -z "$SDKMANAGER" ]; then
-            echo "Could not find sdkmanager in the runner's preinstalled Android SDK."
-            find /usr/local/lib/android/sdk -maxdepth 4 -type d 2>/dev/null | head -n 80
-            exit 1
-          fi
-          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
-          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
-          echo "/usr/local/lib/android/sdk/platform-tools" >> "$GITHUB_PATH"
-      - name: Accept Android SDK licenses
-        shell: bash
-        run: yes | "$SDKMANAGER" --licenses || true
-      - name: Install Android SDK platform
-        shell: bash
-        run: "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: "12266719"
+          accept-android-sdk-licenses: true
+          packages: "platform-tools platforms;android-35 build-tools;35.0.0"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.11.1"
