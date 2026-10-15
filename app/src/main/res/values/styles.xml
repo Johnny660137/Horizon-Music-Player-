@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.Horizon" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#8AA7FF</item>
+        <item name="android:statusBarColor">#090C14</item>
+        <item name="android:navigationBarColor">#090C14</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
